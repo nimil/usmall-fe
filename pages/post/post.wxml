@@ -1,0 +1,100 @@
+<!--pages/post/post.wxml-->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="header">
+    <text class="cancel-btn" bindtap="onCancel">取消</text>
+    <text class="title">发布帖子</text>
+    <text class="publish-btn {{canPublish ? 'active' : ''}}" bindtap="onPublish">发布</text>
+  </view>
+
+  <!-- 内容编辑区域 -->
+  <view class="content-area">
+    <!-- 分类选择 -->
+    <view class="category-selector">
+      <text class="label">选择话题</text>
+      
+      <!-- 加载状态 -->
+      <view class="loading-container" wx:if="{{categoriesLoading}}">
+        <text class="loading-text">加载话题中...</text>
+      </view>
+      
+      <view class="category-list" wx:if="{{!categoriesLoading}}">
+        <view class="category-item {{selectedCategory === item.name ? 'active' : ''}}" 
+              wx:for="{{categories}}" 
+              wx:key="id"
+              bindtap="onCategorySelect"
+              data-category="{{item.name}}">
+          <text class="category-icon">{{item.icon}}</text>
+          <text class="category-name">{{item.name}}</text>
+          <text class="category-count" wx:if="{{item.postCount}}">({{item.postCount}})</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 标题输入 -->
+    <view class="input-group">
+      <input class="title-input" 
+             placeholder="请输入标题" 
+             value="{{title}}"
+             bindinput="onTitleInput"
+             maxlength="50" />
+      <text class="char-count">{{title.length}}/50</text>
+    </view>
+
+    <!-- 内容输入 -->
+    <view class="input-group">
+      <textarea class="content-input" 
+                placeholder="分享你的想法..." 
+                value="{{content}}"
+                bindinput="onContentInput"
+                maxlength="1000"
+                auto-height />
+      <text class="char-count">{{content.length}}/1000</text>
+    </view>
+
+    <!-- 图片上传 -->
+    <view class="image-upload">
+      <text class="label">添加图片</text>
+      
+      <!-- 上传状态 -->
+      <view class="upload-status" wx:if="{{uploading}}">
+        <text class="upload-text">正在上传图片...</text>
+      </view>
+      
+      <view class="image-list">
+        <view class="image-item" wx:for="{{images}}" wx:key="index">
+          <image class="uploaded-image" src="{{item}}" mode="aspectFill" />
+          <view class="delete-btn" bindtap="onDeleteImage" data-index="{{index}}">×</view>
+          <!-- 上传成功标识 -->
+          <view class="upload-success" wx:if="{{uploadedImages[index]}}">
+            <text class="success-icon">✓</text>
+          </view>
+          <!-- 上传中标识 -->
+          <view class="upload-loading" wx:if="{{!uploadedImages[index]}}">
+            <text class="loading-icon">⏳</text>
+          </view>
+        </view>
+        <view class="add-image-btn" bindtap="onAddImage" wx:if="{{images.length < 9 && !uploading}}">
+          <text class="add-icon">+</text>
+          <text class="add-text">添加图片</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 标签输入 -->
+    <view class="input-group">
+      <input class="tag-input" 
+             placeholder="添加标签，用逗号分隔" 
+             value="{{tagInput}}"
+             bindinput="onTagInput" />
+    </view>
+
+    <!-- 标签展示 -->
+    <view class="tags-display" wx:if="{{tags.length > 0}}">
+      <view class="tag-item" wx:for="{{tags}}" wx:key="*this">
+        <text class="tag-text">{{item}}</text>
+        <text class="tag-delete" bindtap="onDeleteTag" data-index="{{index}}">×</text>
+      </view>
+    </view>
+  </view>
+</view> 

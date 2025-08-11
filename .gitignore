@@ -1,0 +1,38 @@
+# 敏感配置文件
+utils/config.js
+project.config.json
+project.private.config.json
+
+# 微信开发者工具生成的文件
+.idea/
+.vscode/
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.temp
+
+# 编译输出
+dist/
+build/
+
+# 依赖文件
+node_modules/
+
+# 环境变量文件
+.env
+.env.local
+.env.production
+
+# 密钥文件
+*.pem
+*.key
+*.p12
+
+# 其他敏感文件
+secrets/
+private/ 

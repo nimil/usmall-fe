@@ -1,0 +1,179 @@
+/* app.wxss - 微信读书风格 + iOS设计语言 */
+
+/* 全局样式重置 */
+page {
+  background-color: #f7f8fa;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333333;
+  line-height: 1.6;
+}
+
+/* 容器基础样式 */
+.container {
+  min-height: 100vh;
+  background-color: #f7f8fa;
+}
+
+/* 卡片样式 - 微信读书风格 */
+.card {
+  background: #ffffff;
+  border-radius: 12rpx;
+  margin: 16rpx 24rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  border: 1rpx solid #f0f0f0;
+}
+
+/* 标题样式 */
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 16rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 12rpx;
+}
+
+/* 文本样式 */
+.text-primary {
+  color: #1a1a1a;
+  font-size: 28rpx;
+}
+
+.text-secondary {
+  color: #666666;
+  font-size: 26rpx;
+}
+
+.text-muted {
+  color: #999999;
+  font-size: 24rpx;
+}
+
+/* 按钮样式 - iOS风格 */
+.btn {
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: #07c160;
+  color: #ffffff;
+}
+
+.btn-primary:active {
+  background: #06ad56;
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: #333333;
+}
+
+.btn-secondary:active {
+  background: #e5e5e5;
+  transform: scale(0.98);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #07c160;
+  border: 1rpx solid #07c160;
+}
+
+.btn-outline:active {
+  background: rgba(7, 193, 96, 0.1);
+}
+
+/* 输入框样式 */
+.input {
+  background: #ffffff;
+  border: 1rpx solid #e5e5e5;
+  border-radius: 8rpx;
+  padding: 20rpx 24rpx;
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.input:focus {
+  border-color: #07c160;
+  box-shadow: 0 0 0 2rpx rgba(7, 193, 96, 0.1);
+}
+
+/* 分割线 */
+.divider {
+  height: 1rpx;
+  background: #f0f0f0;
+  margin: 16rpx 0;
+}
+
+/* 头像样式 */
+.avatar {
+  border-radius: 50%;
+  background: #f0f0f0;
+}
+
+.avatar-sm {
+  width: 64rpx;
+  height: 64rpx;
+}
+
+.avatar-md {
+  width: 80rpx;
+  height: 80rpx;
+}
+
+.avatar-lg {
+  width: 120rpx;
+  height: 120rpx;
+}
+
+/* 标签样式 */
+.tag {
+  display: inline-block;
+  padding: 8rpx 16rpx;
+  background: #f0f0f0;
+  color: #666666;
+  border-radius: 16rpx;
+  font-size: 24rpx;
+  margin-right: 12rpx;
+  margin-bottom: 8rpx;
+}
+
+.tag-primary {
+  background: rgba(7, 193, 96, 0.1);
+  color: #07c160;
+}
+
+/* 间距工具类 */
+.mt-8 { margin-top: 16rpx; }
+.mt-16 { margin-top: 32rpx; }
+.mt-24 { margin-top: 48rpx; }
+.mb-8 { margin-bottom: 16rpx; }
+.mb-16 { margin-bottom: 32rpx; }
+.mb-24 { margin-bottom: 48rpx; }
+.p-16 { padding: 32rpx; }
+.p-24 { padding: 48rpx; }
+
+/* 布局工具类 */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.flex-1 { flex: 1; }
+
+/* 文本对齐 */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; } 

@@ -1,0 +1,124 @@
+/* pages/profile/profile.wxss */
+
+/* 用户信息卡片 */
+.user-card {
+  margin-top: 24rpx;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-details {
+  flex: 1;
+  margin-left: 24rpx;
+}
+
+.user-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.user-desc {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+}
+
+.user-actions {
+  margin-left: 24rpx;
+}
+
+.edit-btn {
+  color: #07c160;
+  font-size: 28rpx;
+  padding: 8rpx 16rpx;
+}
+
+/* 统计信息 */
+.stats-card {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.stats-item {
+  flex: 1;
+}
+
+.stats-number {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.stats-label {
+  font-size: 24rpx;
+  color: #666666;
+  display: block;
+}
+
+/* 菜单区域 */
+.menu-section {
+  margin-top: 24rpx;
+}
+
+.menu-group {
+  margin-bottom: 16rpx;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menu-item:active {
+  background: rgba(7, 193, 96, 0.05);
+}
+
+.menu-icon {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  margin-right: 16rpx;
+}
+
+.menu-title {
+  flex: 1;
+  font-size: 28rpx;
+  color: #1a1a1a;
+}
+
+.menu-arrow {
+  font-size: 32rpx;
+  color: #cccccc;
+  margin-left: 16rpx;
+}
+
+/* 授权说明 */
+.auth-notice {
+  margin: 40rpx;
+  text-align: center;
+  padding: 30rpx;
+  background: white;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.notice-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+} 

@@ -1,0 +1,147 @@
+<!--pages/detail/detail.wxml-->
+<view class="container">
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 帖子内容 -->
+  <view class="post-content" wx:if="{{!loading && post.id}}">
+    <!-- 帖子头部信息 -->
+    <view class="post-header">
+      <view class="author-info">
+        <image class="author-avatar" src="{{post.author.avatar}}" mode="aspectFill" />
+        <view class="author-details">
+          <view class="author-name">
+            <text>{{post.author.nickname}}</text>
+            <text wx:if="{{post.author.isVerified}}" class="verified-badge">✓</text>
+          </view>
+          <view class="author-level">Lv.{{post.author.level}}</view>
+        </view>
+      </view>
+      <view class="post-meta">
+        <text class="post-time">{{post.createdAt}}</text>
+        <view class="post-category" wx:if="{{post.category}}">{{post.category}}</view>
+      </view>
+    </view>
+
+    <!-- 帖子主体内容 -->
+    <view class="post-body">
+      <text class="post-title" wx:if="{{post.title}}">{{post.title}}</text>
+      <text class="post-text">{{post.content}}</text>
+      
+      <!-- 图片展示 -->
+      <view class="post-images" wx:if="{{post.images && post.images.length > 0}}">
+        <image class="post-image" 
+               wx:for="{{post.images}}" 
+               wx:key="*this"
+               src="{{item}}" 
+               mode="widthFix"
+               bindtap="onImagePreview"
+               data-url="{{item}}" />
+      </view>
+
+      <!-- 标签 -->
+      <view class="post-tags" wx:if="{{post.tags && post.tags.length > 0}}">
+        <text class="tag" wx:for="{{post.tags}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 帖子统计信息 -->
+    <view class="post-stats">
+      <view class="stat-item">
+        <text class="stat-icon">👁️</text>
+        <text class="stat-text">{{post.stats.views || 0}}</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-icon">💬</text>
+        <text class="stat-text">{{post.stats.comments || 0}}</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-icon">❤️</text>
+        <text class="stat-text">{{post.stats.likes || 0}}</text>
+      </view>
+    </view>
+
+    <!-- 互动按钮 -->
+    <view class="post-actions">
+      <view class="action-item {{post.isLiked ? 'liked' : ''}}" bindtap="onLike">
+        <text class="action-icon">{{post.isLiked ? '❤️' : '🤍'}}</text>
+        <text class="action-text">点赞</text>
+      </view>
+      <view class="action-item" bindtap="onComment">
+        <text class="action-icon">💬</text>
+        <text class="action-text">评论</text>
+      </view>
+      <view class="action-item" bindtap="onShare">
+        <text class="action-icon">📤</text>
+        <text class="action-text">分享</text>
+      </view>
+      <view class="action-item" bindtap="onMoreActions">
+        <text class="action-icon">⋯</text>
+        <text class="action-text">更多</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && !post.id}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">帖子不存在或已被删除</text>
+  </view>
+
+  <!-- 评论区域 -->
+  <view class="comments-section" wx:if="{{!loading && post.id}}">
+    <view class="section-header">
+      <text class="section-title">评论 ({{comments.length}})</text>
+      <text class="section-subtitle">快来发表你的看法吧</text>
+    </view>
+    
+    <!-- 评论加载状态 -->
+    <view class="loading-container" wx:if="{{commentsLoading}}">
+      <text class="loading-text">加载评论中...</text>
+    </view>
+    
+    <view class="comment-list" wx:if="{{!commentsLoading}}">
+      <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+        <image class="comment-avatar" src="{{item.author.avatar}}" mode="aspectFill" />
+        <view class="comment-content">
+          <view class="comment-header">
+            <text class="comment-author">{{item.author.nickname}}</text>
+            <text class="comment-time">{{item.createdAt}}</text>
+          </view>
+          <text class="comment-text">{{item.content}}</text>
+          <view class="comment-actions">
+            <text class="comment-action" bindtap="onLikeComment" data-id="{{item.id}}">
+              👍 {{item.likes || 0}}
+            </text>
+            <text class="comment-action" bindtap="onReplyComment" data-id="{{item.id}}">
+              回复
+            </text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 评论空状态 -->
+      <view class="empty-comments" wx:if="{{!commentsLoading && comments.length === 0}}">
+        <text class="empty-icon">💬</text>
+        <text class="empty-text">暂无评论，快来抢沙发吧！</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area-bottom"></view>
+</view>
+
+<!-- 评论输入框 -->
+<view class="comment-input-container">
+  <view class="comment-input-bar">
+    <input class="comment-input" 
+           placeholder="写下你的评论..." 
+           value="{{commentText}}"
+           bindinput="onCommentInput"
+           focus="{{commentFocus}}" />
+    <text class="send-btn {{commentText ? 'active' : ''}}" bindtap="onSendComment">发送</text>
+  </view>
+</view> 

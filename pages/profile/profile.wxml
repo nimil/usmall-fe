@@ -1,0 +1,101 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <!-- 用户信息卡片 -->
+  <view class="user-card card">
+    <view class="user-info">
+      <image class="avatar avatar-lg" src="{{userInfo.avatarUrl || '/assets/default-avatar.png'}}" />
+      <view class="user-details">
+        <text class="user-name">{{userInfo.nickName || '未登录'}}</text>
+        <text class="user-desc">{{hasUserInfo ? '已授权' : '点击登录账号'}}</text>
+      </view>
+      <view class="user-actions">
+        <button 
+          class="btn btn-outline" 
+          bindtap="onLogin" 
+          wx:if="{{!hasUserInfo}}"
+          loading="{{loading}}"
+          disabled="{{loading}}"
+        >
+          {{loading ? '授权中...' : '登录'}}
+        </button>
+        <text class="edit-btn" bindtap="onEditProfile" wx:else>编辑</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats-card card">
+    <view class="stats-item">
+      <text class="stats-number">{{stats.posts}}</text>
+      <text class="stats-label">帖子</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number">{{stats.likes}}</text>
+      <text class="stats-label">获赞</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number">{{stats.followers}}</text>
+      <text class="stats-label">粉丝</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number">{{stats.following}}</text>
+      <text class="stats-label">关注</text>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <view class="menu-group card">
+      <view class="menu-item" bindtap="onMyPosts">
+        <view class="menu-icon">📝</view>
+        <text class="menu-title">我的帖子</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="divider"></view>
+      <view class="menu-item" bindtap="onMyLikes">
+        <view class="menu-icon">❤️</view>
+        <text class="menu-title">我的点赞</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="divider"></view>
+      <view class="menu-item" bindtap="onMyComments">
+        <view class="menu-icon">💬</view>
+        <text class="menu-title">我的评论</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="menu-group card">
+      <!-- 已授权用户显示清除选项 -->
+      <view class="menu-item" bindtap="clearUserInfo" wx:if="{{hasUserInfo}}">
+        <view class="menu-icon">🗑️</view>
+        <text class="menu-title">清除用户信息</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="divider" wx:if="{{hasUserInfo}}"></view>
+      
+      <view class="menu-item" bindtap="onSettings">
+        <view class="menu-icon">⚙️</view>
+        <text class="menu-title">设置</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="divider"></view>
+      <view class="menu-item" bindtap="onFeedback">
+        <view class="menu-icon">📮</view>
+        <text class="menu-title">意见反馈</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="divider"></view>
+      <view class="menu-item" bindtap="onAbout">
+        <view class="menu-icon">ℹ️</view>
+        <text class="menu-title">关于我们</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 授权说明 -->
+  <view class="auth-notice" wx:if="{{!hasUserInfo}}">
+    <text class="notice-text">点击上方按钮授权获取您的头像和昵称</text>
+  </view>
+</view> 
