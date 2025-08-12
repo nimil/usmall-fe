@@ -1,0 +1,62 @@
+<!--pages/user-register/user-register.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">完善用户信息</text>
+    <text class="subtitle">请完善您的头像和昵称信息</text>
+  </view>
+
+  <view class="form-container card">
+    <form bindsubmit="onSubmit">
+      <!-- 头像选择 -->
+      <view class="form-item">
+        <text class="label">头像</text>
+        <view class="avatar-section">
+          <button 
+            class="avatar-wrapper" 
+            open-type="chooseAvatar" 
+            bind:chooseavatar="onChooseAvatar"
+          >
+            <image 
+              class="avatar" 
+              src="{{avatarUrl || defaultAvatarUrl}}"
+              mode="aspectFill"
+            />
+            <view class="avatar-hint">
+              <text class="hint-text">点击选择头像</text>
+            </view>
+          </button>
+        </view>
+      </view>
+
+      <!-- 昵称输入 -->
+      <view class="form-item">
+        <text class="label">昵称</text>
+        <input 
+          type="nickname" 
+          class="nickname-input" 
+          placeholder="请输入昵称"
+          value="{{nickname}}"
+          bindinput="onNicknameInput"
+          bindblur="onNicknameBlur"
+        />
+      </view>
+
+      <!-- 提交按钮 -->
+      <button 
+        class="submit-btn" 
+        form-type="submit"
+        loading="{{loading}}"
+        disabled="{{!avatarUrl || !nickname || loading}}"
+      >
+        {{loading ? '注册中...' : '完成注册'}}
+      </button>
+    </form>
+  </view>
+
+  <!-- 说明文字 -->
+  <view class="notice card">
+    <text class="notice-text">
+      根据相关法律法规，为确保信息安全，由用户上传的图片、昵称等信息微信侧将进行安全检测。
+    </text>
+  </view>
+</view>

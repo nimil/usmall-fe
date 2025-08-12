@@ -1,0 +1,102 @@
+<!--pages/my-posts/my-posts.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">我的帖子</text>
+    <text class="post-count">共 {{total}} 条</text>
+    <button class="test-btn" bindtap="onTest401" wx:if="{{hasUserInfo}}">测试401</button>
+  </view>
+
+  <!-- 帖子列表 -->
+  <view class="posts-list" wx:if="{{posts.length > 0}}">
+    <view 
+      class="post-item card" 
+      wx:for="{{posts}}" 
+      wx:key="id"
+      bindtap="onPostTap"
+      data-post="{{item}}"
+    >
+      <!-- 帖子头部 -->
+      <view class="post-header">
+        <view class="post-meta">
+          <text class="post-time">{{item.createdAt}}</text>
+          <view class="post-category" wx:if="{{item.categoryName}}">{{item.categoryName}}</view>
+          <view class="post-status {{item.status === 'published' ? 'published' : 'draft'}}">
+            {{item.status === 'published' ? '已发布' : '草稿'}}
+          </view>
+        </view>
+        <view class="post-actions">
+          <text class="action-btn edit-btn" bindtap="onEditPost" data-id="{{item.id}}">编辑</text>
+          <text class="action-btn delete-btn" bindtap="onDeletePost" data-id="{{item.id}}">删除</text>
+        </view>
+      </view>
+
+      <!-- 帖子内容 -->
+      <view class="post-content">
+        <text class="post-title">{{item.title}}</text>
+        <text class="post-excerpt">{{item.content}}</text>
+      </view>
+
+      <!-- 帖子图片 -->
+      <view class="post-images" wx:if="{{item.images && item.images.length > 0}}">
+        <image 
+          class="post-image" 
+          wx:for="{{item.images}}" 
+          wx:for-item="image" 
+          wx:key="*this"
+          src="{{image}}"
+          mode="aspectFill"
+          bindtap="onImageTap"
+          data-url="{{image}}"
+        />
+      </view>
+
+      <!-- 帖子统计 -->
+      <view class="post-stats">
+        <view class="stat-item">
+          <text class="stat-icon">👁️</text>
+          <text class="stat-number">{{item.viewCount || 0}}</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-icon">❤️</text>
+          <text class="stat-number">{{item.likeCount || 0}}</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-icon">💬</text>
+          <text class="stat-number">{{item.commentCount || 0}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 未登录状态 -->
+  <view class="auth-state" wx:if="{{!hasUserInfo}}">
+    <view class="auth-icon">🔐</view>
+    <text class="auth-title">需要登录</text>
+    <text class="auth-desc">查看我的帖子需要先登录账号</text>
+    <button class="btn btn-primary" bindtap="onGoToLogin">去登录</button>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{posts.length === 0 && !loading && hasUserInfo}}">
+    <view class="empty-icon">📝</view>
+    <text class="empty-title">还没有发布过帖子</text>
+    <text class="empty-desc">快去发布你的第一个帖子吧！</text>
+    <button class="btn btn-primary" bindtap="onCreatePost">发布帖子</button>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{hasMore && !loading && posts.length > 0}}">
+    <text class="load-more-text" bindtap="onLoadMore">加载更多</text>
+  </view>
+
+  <!-- 没有更多数据 -->
+  <view class="no-more" wx:if="{{!hasMore && posts.length > 0}}">
+    <text class="no-more-text">没有更多数据了</text>
+  </view>
+</view>

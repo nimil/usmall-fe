@@ -30,6 +30,38 @@ App({
   },
   
   globalData: {
-    userInfo: null
+    userInfo: null,
+    needUserRegister: false,
+    lastApiCall: null
+  },
+
+  /**
+   * 安全地更新全局状态
+   */
+  updateGlobalData(key, value) {
+    try {
+      if (this.globalData) {
+        this.globalData[key] = value;
+        console.log(`全局状态已更新: ${key} =`, value);
+        return true;
+      }
+    } catch (error) {
+      console.error('更新全局状态失败:', error);
+    }
+    return false;
+  },
+
+  /**
+   * 安全地获取全局状态
+   */
+  getGlobalData(key) {
+    try {
+      if (this.globalData) {
+        return this.globalData[key];
+      }
+    } catch (error) {
+      console.error('获取全局状态失败:', error);
+    }
+    return null;
   }
 }) 

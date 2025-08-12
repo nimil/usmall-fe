@@ -3,7 +3,9 @@
     "pages/community/community",
     "pages/profile/profile",
     "pages/post/post",
-    "pages/detail/detail"
+    "pages/detail/detail",
+    "pages/my-posts/my-posts",
+    "pages/user-register/user-register"
   ],
   "window": {
     "backgroundTextStyle": "light",
