@@ -11,14 +11,21 @@ Page({
   },
 
   onLoad(options) {
+    console.log('注册页面加载，参数:', options);
+    
     // 检查是否是从401错误跳转过来的
     if (options.from === '401') {
+      console.log('检测到from=401参数，显示提示');
       wx.showToast({
         title: '请先完善用户信息',
         icon: 'none',
         duration: 2000
       });
     }
+  },
+
+  onShow() {
+    console.log('注册页面显示');
   },
 
   /**

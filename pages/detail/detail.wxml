@@ -21,7 +21,7 @@
       </view>
       <view class="post-meta">
         <text class="post-time">{{post.createdAt}}</text>
-        <view class="post-category" wx:if="{{post.category}}">{{post.category}}</view>
+        <view class="post-category" wx:if="{{post.categoryName}}">{{post.categoryName}}</view>
       </view>
     </view>
 
@@ -47,39 +47,23 @@
       </view>
     </view>
 
-    <!-- 帖子统计信息 -->
-    <view class="post-stats">
-      <view class="stat-item">
-        <text class="stat-icon">👁️</text>
-        <text class="stat-text">{{post.stats.views || 0}}</text>
+    <!-- 互动按钮区域 -->
+    <view class="post-interaction">
+      <view class="interaction-actions">
+        <view class="action-item {{post.isLiked ? 'liked' : ''}}" bindtap="onLike">
+          <text class="action-icon">{{post.isLiked ? '❤️' : '🤍'}}</text>
+          <text class="action-text">{{post.stats.likes || 0}}</text>
+        </view>
+        <button class="action-item share-btn" open-type="share">
+          <text class="action-icon">📤</text>
+          <text class="action-text">分享</text>
+        </button>
       </view>
-      <view class="stat-item">
-        <text class="stat-icon">💬</text>
-        <text class="stat-text">{{post.stats.comments || 0}}</text>
-      </view>
-      <view class="stat-item">
-        <text class="stat-icon">❤️</text>
-        <text class="stat-text">{{post.stats.likes || 0}}</text>
-      </view>
-    </view>
-
-    <!-- 互动按钮 -->
-    <view class="post-actions">
-      <view class="action-item {{post.isLiked ? 'liked' : ''}}" bindtap="onLike">
-        <text class="action-icon">{{post.isLiked ? '❤️' : '🤍'}}</text>
-        <text class="action-text">点赞</text>
-      </view>
-      <view class="action-item" bindtap="onComment">
-        <text class="action-icon">💬</text>
-        <text class="action-text">评论</text>
-      </view>
-      <view class="action-item" bindtap="onShare">
-        <text class="action-icon">📤</text>
-        <text class="action-text">分享</text>
-      </view>
-      <view class="action-item" bindtap="onMoreActions">
-        <text class="action-icon">⋯</text>
-        <text class="action-text">更多</text>
+      
+      <!-- 浏览量显示 -->
+      <view class="view-count">
+        <text class="view-icon">👁️</text>
+        <text class="view-text">{{post.stats.views || 0}}</text>
       </view>
     </view>
   </view>
@@ -94,7 +78,6 @@
   <view class="comments-section" wx:if="{{!loading && post.id}}">
     <view class="section-header">
       <text class="section-title">评论 ({{comments.length}})</text>
-      <text class="section-subtitle">快来发表你的看法吧</text>
     </view>
     
     <!-- 评论加载状态 -->

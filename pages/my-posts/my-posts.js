@@ -262,7 +262,6 @@ Page({
    * 编辑帖子
    */
   onEditPost(e) {
-    e.stopPropagation();
     const postId = e.currentTarget.dataset.id;
     wx.navigateTo({
       url: `/pages/post/post?id=${postId}&mode=edit`
@@ -273,7 +272,6 @@ Page({
    * 删除帖子
    */
   onDeletePost(e) {
-    e.stopPropagation();
     const postId = e.currentTarget.dataset.id;
     
     wx.showModal({

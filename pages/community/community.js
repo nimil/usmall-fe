@@ -5,7 +5,7 @@ Page({
   data: {
     currentTab: 0,
     categories: [
-      { id: 0, name: '全部', value: 'all', icon: '🏠', code: 'all' }
+      { id: 0, name: '全部', value: 'all', icon: '', code: 'all' }
     ],
     posts: [],
     currentPosts: [],

@@ -18,7 +18,6 @@
         >
           {{loading ? '授权中...' : '登录'}}
         </button>
-        <text class="edit-btn" bindtap="onEditProfile" wx:else>编辑</text>
       </view>
     </view>
   </view>

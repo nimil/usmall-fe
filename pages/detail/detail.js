@@ -52,10 +52,51 @@ Page({
       }
     } catch (error) {
       console.error('加载帖子详情失败:', error);
-      wx.showToast({
-        title: '网络错误，请重试',
-        icon: 'none'
-      });
+      
+      // 检查是否是401错误（包括错误消息中的401信息）
+      if (error.statusCode === 401 || 
+          error.message.includes('User not found') || 
+          error.message.includes('401') ||
+          (error.originalError && error.originalError.statusCode === 401)) {
+        console.log('检测到401错误，跳转到注册页面');
+        console.log('错误详情:', {
+          statusCode: error.statusCode,
+          message: error.message,
+          originalError: error.originalError
+        });
+        
+        // 延迟跳转，确保当前页面状态稳定
+        setTimeout(() => {
+          wx.redirectTo({
+            url: '/pages/user-register/user-register?from=401',
+            success: () => {
+              console.log('成功跳转到注册页面');
+            },
+            fail: (err) => {
+              console.error('跳转到注册页面失败:', err);
+              // 如果redirectTo失败，尝试navigateTo
+              wx.navigateTo({
+                url: '/pages/user-register/user-register?from=401',
+                success: () => {
+                  console.log('通过navigateTo成功跳转到注册页面');
+                },
+                fail: (err2) => {
+                  console.error('navigateTo也失败了:', err2);
+                  wx.showToast({
+                    title: '跳转失败，请手动前往注册',
+                    icon: 'none'
+                  });
+                }
+              });
+            }
+          });
+        }, 100);
+      } else {
+        wx.showToast({
+          title: '网络错误，请重试',
+          icon: 'none'
+        });
+      }
     } finally {
       this.setData({ loading: false });
     }
@@ -84,10 +125,41 @@ Page({
       }
     } catch (error) {
       console.error('加载评论失败:', error);
-      wx.showToast({
-        title: '网络错误，请重试',
-        icon: 'none'
-      });
+      
+      // 检查是否是401错误（包括错误消息中的401信息）
+      if (error.statusCode === 401 || 
+          error.message.includes('User not found') || 
+          error.message.includes('401') ||
+          (error.originalError && error.originalError.statusCode === 401)) {
+        console.log('检测到401错误，跳转到注册页面');
+        console.log('错误详情:', {
+          statusCode: error.statusCode,
+          message: error.message,
+          originalError: error.originalError
+        });
+        
+        // 延迟跳转，确保当前页面状态稳定
+        setTimeout(() => {
+          wx.navigateTo({
+            url: '/pages/user-register/user-register?from=401',
+            success: () => {
+              console.log('成功跳转到注册页面');
+            },
+            fail: (err) => {
+              console.error('跳转到注册页面失败:', err);
+              wx.showToast({
+                title: '跳转失败，请手动前往注册',
+                icon: 'none'
+              });
+            }
+          });
+        }, 100);
+      } else {
+        wx.showToast({
+          title: '网络错误，请重试',
+          icon: 'none'
+        });
+      }
     } finally {
       this.setData({ commentsLoading: false });
     }
@@ -98,19 +170,23 @@ Page({
     const { post } = this.data;
     
     try {
-      const result = await likePost(post.id);
+      // 根据当前状态决定是点赞还是取消点赞
+      const action = post.isLiked ? 'unlike' : 'like';
+      const result = await likePost(post.id, action);
       
       if (result.code === 200) {
-        const isLiked = !post.isLiked;
-        const likes = isLiked ? post.stats.likes + 1 : post.stats.likes - 1;
+        // 使用服务器返回的数据更新UI
+        // 注意：API可能返回不同的数据结构，需要适配
+        const isLiked = result.data && result.data.isLiked !== undefined ? result.data.isLiked : !post.isLiked;
+        const likesCount = result.data && result.data.likesCount !== undefined ? result.data.likesCount : (isLiked ? post.stats.likes + 1 : post.stats.likes - 1);
         
         this.setData({
           post: {
             ...post,
-            isLiked,
+            isLiked: isLiked,
             stats: {
               ...post.stats,
-              likes
+              likes: likesCount
             }
           }
         });
@@ -127,10 +203,41 @@ Page({
       }
     } catch (error) {
       console.error('点赞失败:', error);
-      wx.showToast({
-        title: '网络错误，请重试',
-        icon: 'none'
-      });
+      
+      // 检查是否是401错误（包括错误消息中的401信息）
+      if (error.statusCode === 401 || 
+          error.message.includes('User not found') || 
+          error.message.includes('401') ||
+          (error.originalError && error.originalError.statusCode === 401)) {
+        console.log('检测到401错误，跳转到注册页面');
+        console.log('错误详情:', {
+          statusCode: error.statusCode,
+          message: error.message,
+          originalError: error.originalError
+        });
+        
+        // 延迟跳转，确保当前页面状态稳定
+        setTimeout(() => {
+          wx.navigateTo({
+            url: '/pages/user-register/user-register?from=401',
+            success: () => {
+              console.log('成功跳转到注册页面');
+            },
+            fail: (err) => {
+              console.error('跳转到注册页面失败:', err);
+              wx.showToast({
+                title: '跳转失败，请手动前往注册',
+                icon: 'none'
+              });
+            }
+          });
+        }, 100);
+      } else {
+        wx.showToast({
+          title: '网络错误，请重试',
+          icon: 'none'
+        });
+      }
     }
   },
 
@@ -175,7 +282,7 @@ Page({
 
   // 发送评论
   async onSendComment() {
-    const { commentText, comments, postId } = this.data;
+    const { commentText, postId } = this.data;
     
     if (!commentText.trim()) {
       wx.showToast({
@@ -191,17 +298,14 @@ Page({
       });
 
       if (result.code === 200) {
-        // 格式化时间
-        const newComment = {
-          ...result.data,
-          createdAt: this.formatTime(result.data.createdAt)
-        };
-
+        // 清空输入框并隐藏键盘
         this.setData({
-          comments: [newComment, ...comments],
           commentText: '',
           commentFocus: false
         });
+
+        // 刷新评论列表
+        await this.loadComments(postId);
 
         wx.showToast({
           title: '评论成功',
@@ -247,10 +351,34 @@ Page({
 
   // 分享到微信
   onShareAppMessage() {
+    const { post, postId } = this.data;
+    
+    const promise = new Promise(resolve => {
+      setTimeout(() => {
+        resolve({
+          title: post.title || post.content?.substring(0, 50) || '精彩内容分享',
+          path: `/pages/detail/detail?id=${postId}`,
+          imageUrl: post.images?.[0] || '/assets/share-default.jpg'
+        });
+      }, 1000);
+    });
+    
     return {
-      title: this.data.post.title,
-      path: `/pages/detail/detail?id=${this.data.postId}`,
-      imageUrl: this.data.post.images?.[0] || '/assets/share-default.jpg'
+      title: post.title || post.content?.substring(0, 50) || '精彩内容分享',
+      path: `/pages/detail/detail?id=${postId}`,
+      imageUrl: post.images?.[0] || '/assets/share-default.jpg',
+      promise
+    };
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    const { post, postId } = this.data;
+    
+    return {
+      title: post.title || post.content?.substring(0, 50) || '精彩内容分享',
+      path: `/pages/detail/detail?id=${postId}`,
+      imageUrl: post.images?.[0] || '/assets/share-default.jpg'
     };
   },
 

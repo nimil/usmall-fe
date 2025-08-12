@@ -42,7 +42,9 @@ class ApiService {
         '/api/posts/my',
         '/api/posts',
         '/api/user/profile',
-        '/api/auth/register'
+        '/api/auth/register',
+        '/api/posts/', // 帖子详情相关
+        '/comments' // 评论相关
       ];
       
       if (result.statusCode === 401 && authRequiredPaths.some(path => options.path.includes(path))) {
@@ -75,7 +77,9 @@ class ApiService {
         '/api/posts/my',
         '/api/posts',
         '/api/user/profile',
-        '/api/auth/register'
+        '/api/auth/register',
+        '/api/posts/', // 帖子详情相关
+        '/comments' // 评论相关
       ];
       
       if ((error.statusCode === 401 || (error.originalError && error.originalError.statusCode === 401)) && 
@@ -257,13 +261,17 @@ const addComment = async (postId, commentData) => {
 /**
  * 点赞帖子
  * @param {string} postId - 帖子ID
+ * @param {string} action - 操作类型 'like' 或 'unlike'
  * @returns {Promise} 返回点赞结果
  */
-const likePost = async (postId) => {
+const likePost = async (postId, action = 'like') => {
   try {
     const result = await apiService.call({
       path: `/api/posts/${postId}/like`,
-      method: 'POST'
+      method: 'POST',
+      data: {
+        action: action
+      }
     });
     
     console.log(`点赞帖子调用结果:`, result);
