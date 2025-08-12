@@ -35,42 +35,18 @@ class ApiService {
       console.log(`微信云托管调用结果: ${result.errMsg} | callid: ${result.callID}`);
       console.log('API响应状态码:', result.statusCode);
       console.log('API响应数据:', result.data);
-      console.log('API响应完整对象:', result);
       
-      // 检查401错误
-      if (result.statusCode === 401) {
+      // 检查401错误 - 只在需要用户认证的API中检查
+      const authRequiredPaths = [
+        '/api/auth/check',
+        '/api/posts/my',
+        '/api/posts',
+        '/api/user/profile',
+        '/api/auth/register'
+      ];
+      
+      if (result.statusCode === 401 && authRequiredPaths.some(path => options.path.includes(path))) {
         console.log('检测到401错误，需要用户注册');
-        
-        // 安全地更新全局状态
-        try {
-          const app = wx.getApp();
-          if (app && typeof app.updateGlobalData === 'function') {
-            app.updateGlobalData('needUserRegister', true);
-            app.updateGlobalData('lastApiCall', options);
-          } else if (app && app.globalData) {
-            app.globalData.needUserRegister = true;
-            app.globalData.lastApiCall = options;
-            console.log('全局状态已更新');
-          } else {
-            console.log('全局应用实例不可用');
-          }
-        } catch (error) {
-          console.log('获取全局应用实例失败:', error);
-        }
-        
-        // 直接跳转到用户注册页面
-        setTimeout(() => {
-          console.log('执行页面跳转');
-          wx.navigateTo({
-            url: '/pages/user-register/user-register?from=401',
-            success: () => {
-              console.log('页面跳转成功');
-            },
-            fail: (error) => {
-              console.error('页面跳转失败:', error);
-            }
-          });
-        }, 100);
         
         // 抛出401错误，让调用方处理
         const error = new Error('User not found, please register first');
@@ -80,39 +56,8 @@ class ApiService {
       }
       
       // 检查data中的code是否为401（某些API可能返回不同的格式）
-      if (result.data && result.data.code === 401) {
+      if (result.data && result.data.code === 401 && authRequiredPaths.some(path => options.path.includes(path))) {
         console.log('检测到data中的401错误，需要用户注册');
-        
-        // 安全地更新全局状态
-        try {
-          const app = wx.getApp();
-          if (app && typeof app.updateGlobalData === 'function') {
-            app.updateGlobalData('needUserRegister', true);
-            app.updateGlobalData('lastApiCall', options);
-          } else if (app && app.globalData) {
-            app.globalData.needUserRegister = true;
-            app.globalData.lastApiCall = options;
-            console.log('全局状态已更新');
-          } else {
-            console.log('全局应用实例不可用');
-          }
-        } catch (error) {
-          console.log('获取全局应用实例失败:', error);
-        }
-        
-        // 直接跳转到用户注册页面
-        setTimeout(() => {
-          console.log('执行页面跳转');
-          wx.navigateTo({
-            url: '/pages/user-register/user-register?from=401',
-            success: () => {
-              console.log('页面跳转成功');
-            },
-            fail: (error) => {
-              console.error('页面跳转失败:', error);
-            }
-          });
-        }, 100);
         
         const error = new Error('User not found, please register first');
         error.statusCode = 401;
@@ -124,39 +69,18 @@ class ApiService {
     } catch (error) {
       console.error('云托管调用失败:', error);
       
-      // 检查是否是401错误
-      if (error.statusCode === 401 || (error.originalError && error.originalError.statusCode === 401)) {
+      // 检查是否是401错误 - 只在需要用户认证的API中检查
+      const authRequiredPaths = [
+        '/api/auth/check',
+        '/api/posts/my',
+        '/api/posts',
+        '/api/user/profile',
+        '/api/auth/register'
+      ];
+      
+      if ((error.statusCode === 401 || (error.originalError && error.originalError.statusCode === 401)) && 
+          authRequiredPaths.some(path => options.path.includes(path))) {
         console.log('在catch块中检测到401错误');
-        
-        // 安全地更新全局状态
-        try {
-          const app = wx.getApp();
-          if (app && typeof app.updateGlobalData === 'function') {
-            app.updateGlobalData('needUserRegister', true);
-            app.updateGlobalData('lastApiCall', options);
-          } else if (app && app.globalData) {
-            app.globalData.needUserRegister = true;
-            app.globalData.lastApiCall = options;
-            console.log('全局状态已更新');
-          } else {
-            console.log('全局应用实例不可用');
-          }
-        } catch (appError) {
-          console.log('获取全局应用实例失败:', appError);
-        }
-        
-        setTimeout(() => {
-          console.log('在catch块中执行页面跳转');
-          wx.navigateTo({
-            url: '/pages/user-register/user-register?from=401',
-            success: () => {
-              console.log('catch块中页面跳转成功');
-            },
-            fail: (err) => {
-              console.error('catch块中页面跳转失败:', err);
-            }
-          });
-        }, 100);
       }
       
       throw error;
@@ -483,6 +407,25 @@ const deletePost = async (postId) => {
 };
 
 /**
+ * 检查用户是否已注册
+ * @returns {Promise} 返回检查结果 {exists, user}
+ */
+const checkUserRegistration = async () => {
+  try {
+    const result = await apiService.call({
+      path: '/api/auth/check',
+      method: 'GET'
+    });
+    
+    console.log(`检查用户注册状态调用结果:`, result);
+    return result;
+  } catch (error) {
+    console.error('检查用户注册状态失败:', error);
+    throw error;
+  }
+};
+
+/**
  * 用户注册
  * @param {Object} userData - 用户数据 {nickname, avatar, bio}
  * @returns {Promise} 返回注册结果
@@ -521,5 +464,6 @@ module.exports = {
   updateUserProfile,
   getMyPosts,
   deletePost,
+  checkUserRegistration,
   registerUser
 }; 

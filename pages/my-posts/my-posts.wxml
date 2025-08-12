@@ -4,7 +4,6 @@
   <view class="page-header">
     <text class="page-title">我的帖子</text>
     <text class="post-count">共 {{total}} 条</text>
-    <button class="test-btn" bindtap="onTest401" wx:if="{{hasUserInfo}}">测试401</button>
   </view>
 
   <!-- 帖子列表 -->

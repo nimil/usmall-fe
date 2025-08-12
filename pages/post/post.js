@@ -1,5 +1,5 @@
 // pages/post/post.js
-const { createPost, getHotTopics, uploadFile } = require('../../utils/api.js');
+const { createPost, getHotTopics, uploadFile, checkUserRegistration } = require('../../utils/api.js');
 
 Page({
   data: {
@@ -21,6 +21,33 @@ Page({
   onLoad() {
     // 页面加载时的初始化
     this.loadHotTopics();
+    
+    // 延迟检查用户是否已注册，避免与loadHotTopics冲突
+    setTimeout(() => {
+      this.checkUserRegistration();
+    }, 500);
+  },
+
+  /**
+   * 检查用户是否已注册
+   */
+  async checkUserRegistration() {
+    try {
+      const result = await checkUserRegistration();
+      
+      if (result.code === 0 && result.data.exists) {
+        console.log('用户已注册，可以发布帖子');
+      }
+    } catch (error) {
+      console.error('检查用户注册状态失败:', error);
+      
+      // 手动处理401错误，跳转到用户注册页面
+      if (error.statusCode === 401) {
+        wx.navigateTo({
+          url: '/pages/user-register/user-register?from=401'
+        });
+      }
+    }
   },
 
   /**

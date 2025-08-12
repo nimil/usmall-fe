@@ -18,12 +18,9 @@
           >
             <image 
               class="avatar" 
-              src="{{avatarUrl || defaultAvatarUrl}}"
+              src="{{avatarUrl}}"
               mode="aspectFill"
             />
-            <view class="avatar-hint">
-              <text class="hint-text">点击选择头像</text>
-            </view>
           </button>
         </view>
       </view>
@@ -37,7 +34,6 @@
           placeholder="请输入昵称"
           value="{{nickname}}"
           bindinput="onNicknameInput"
-          bindblur="onNicknameBlur"
         />
       </view>
 
@@ -46,7 +42,7 @@
         class="submit-btn" 
         form-type="submit"
         loading="{{loading}}"
-        disabled="{{!avatarUrl || !nickname || loading}}"
+        disabled="{{!nickname || loading}}"
       >
         {{loading ? '注册中...' : '完成注册'}}
       </button>

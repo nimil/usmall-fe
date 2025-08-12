@@ -1,5 +1,5 @@
 // pages/my-posts/my-posts.js
-const { getMyPosts, deletePost } = require('../../utils/api.js');
+const { getMyPosts, deletePost, checkUserRegistration } = require('../../utils/api.js');
 
 Page({
   data: {
@@ -24,10 +24,26 @@ Page({
   /**
    * 检查用户认证状态
    */
-  checkUserAuth() {
+  async checkUserAuth() {
     try {
-      const userInfo = wx.getStorageSync('userInfo');
-      if (userInfo && userInfo.nickName) {
+      const result = await checkUserRegistration();
+      
+      if (result.code === 0 && result.data.exists) {
+        // 用户已注册，更新本地存储的用户信息
+        const userInfo = {
+          id: result.data.user.id,
+          nickName: result.data.user.nickname,
+          avatarUrl: result.data.user.avatar,
+          level: result.data.user.level,
+          isVerified: result.data.user.isVerified
+        };
+        
+        try {
+          wx.setStorageSync('userInfo', userInfo);
+        } catch (error) {
+          console.error('保存用户信息失败:', error);
+        }
+        
         this.setData({
           hasUserInfo: true
         });
@@ -40,7 +56,16 @@ Page({
       }
     } catch (error) {
       console.error('检查用户认证失败:', error);
-      this.showAuthModal();
+      
+      // 手动处理401错误，跳转到用户注册页面
+      if (error.statusCode === 401) {
+        wx.navigateTo({
+          url: '/pages/user-register/user-register?from=401'
+        });
+      } else {
+        // 如果不是401错误，显示认证弹窗
+        this.showAuthModal();
+      }
     }
   },
 
@@ -322,27 +347,6 @@ Page({
       url: '/pages/profile/profile'
     });
   },
-
-  /**
-   * 测试401错误
-   */
-  onTest401() {
-    console.log('测试401错误');
-    
-    // 直接调用API服务来测试401错误处理
-    const { apiService } = require('../../utils/api.js');
-    
-    apiService.call({
-      path: '/api/posts/my?page=1&pageSize=10',
-      method: 'GET'
-    }).then(result => {
-      console.log('API调用成功:', result);
-    }).catch(error => {
-      console.log('API调用失败:', error);
-      console.log('错误状态码:', error.statusCode);
-    });
-  },
-
   /**
    * 加载更多
    */

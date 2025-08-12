@@ -1,5 +1,5 @@
 // pages/profile/profile.js
-const { updateUserProfile } = require('../../utils/api.js');
+const { updateUserProfile, checkUserRegistration } = require('../../utils/api.js');
 
 Page({
   data: {
@@ -7,6 +7,7 @@ Page({
     hasUserInfo: false,
     canIUseGetUserProfile: false,
     loading: false,
+    defaultAvatarUrl: 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0',
     stats: {
       posts: 0,
       likes: 0,
@@ -25,6 +26,11 @@ Page({
     
     // 尝试从本地存储获取用户信息
     this.loadUserInfo();
+    
+    // 延迟检查用户是否已注册，避免与其他API调用冲突
+    setTimeout(() => {
+      this.checkUserRegistration();
+    }, 500);
   },
 
   onShow() {
@@ -39,6 +45,11 @@ Page({
     try {
       const userInfo = wx.getStorageSync('userInfo');
       if (userInfo && userInfo.nickName) {
+        // 检查头像URL是否为临时路径，如果是则使用默认头像
+        if (userInfo.avatarUrl && (userInfo.avatarUrl.startsWith('https://tmp/') || userInfo.avatarUrl.startsWith('http://tmp/'))) {
+          userInfo.avatarUrl = this.data.defaultAvatarUrl;
+        }
+        
         this.setData({
           userInfo: userInfo,
           hasUserInfo: true
@@ -46,6 +57,51 @@ Page({
       }
     } catch (error) {
       console.error('加载用户信息失败:', error);
+    }
+  },
+
+  /**
+   * 检查用户是否已注册
+   */
+  async checkUserRegistration() {
+    try {
+      const result = await checkUserRegistration();
+      
+      if (result.code === 0 && result.data.exists) {
+        // 用户已注册，更新本地存储的用户信息
+        const userInfo = {
+          id: result.data.user.id,
+          nickName: result.data.user.nickname,
+          avatarUrl: result.data.user.avatar,
+          level: result.data.user.level,
+          isVerified: result.data.user.isVerified
+        };
+        
+        // 检查头像URL是否为临时路径，如果是则使用默认头像
+        if (userInfo.avatarUrl && (userInfo.avatarUrl.startsWith('https://tmp/') || userInfo.avatarUrl.startsWith('http://tmp/'))) {
+          userInfo.avatarUrl = this.data.defaultAvatarUrl;
+        }
+        
+        try {
+          wx.setStorageSync('userInfo', userInfo);
+        } catch (error) {
+          console.error('保存用户信息失败:', error);
+        }
+        
+        this.setData({
+          userInfo: userInfo,
+          hasUserInfo: true
+        });
+      }
+    } catch (error) {
+      console.error('检查用户注册状态失败:', error);
+      
+      // 手动处理401错误，跳转到用户注册页面
+      if (error.statusCode === 401) {
+        wx.navigateTo({
+          url: '/pages/user-register/user-register?from=401'
+        });
+      }
     }
   },
 
@@ -64,6 +120,11 @@ Page({
         console.log('获取用户信息成功:', res);
         
         const userInfo = res.userInfo;
+        
+        // 检查头像URL是否为临时路径，如果是则使用默认头像
+        if (userInfo.avatarUrl && (userInfo.avatarUrl.startsWith('https://tmp/') || userInfo.avatarUrl.startsWith('http://tmp/'))) {
+          userInfo.avatarUrl = this.data.defaultAvatarUrl;
+        }
         
         // 保存到本地存储
         try {
@@ -105,6 +166,11 @@ Page({
   getUserInfo(e) {
     if (e.detail.userInfo) {
       const userInfo = e.detail.userInfo;
+      
+      // 检查头像URL是否为临时路径，如果是则使用默认头像
+      if (userInfo.avatarUrl && (userInfo.avatarUrl.startsWith('https://tmp/') || userInfo.avatarUrl.startsWith('http://tmp/'))) {
+        userInfo.avatarUrl = this.data.defaultAvatarUrl;
+      }
       
       // 保存到本地存储
       try {

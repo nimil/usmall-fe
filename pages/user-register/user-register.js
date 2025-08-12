@@ -5,10 +5,9 @@ const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia0
 
 Page({
   data: {
-    avatarUrl: '',
+    avatarUrl: defaultAvatarUrl,
     nickname: '',
-    loading: false,
-    defaultAvatarUrl: defaultAvatarUrl
+    loading: false
   },
 
   onLoad(options) {
@@ -27,10 +26,8 @@ Page({
    */
   onChooseAvatar(e) {
     const { avatarUrl } = e.detail;
-    console.log('选择头像:', avatarUrl);
-    
     this.setData({
-      avatarUrl: avatarUrl
+      avatarUrl,
     });
   },
 
@@ -41,14 +38,6 @@ Page({
     this.setData({
       nickname: e.detail.value
     });
-  },
-
-  /**
-   * 昵称失焦
-   */
-  onNicknameBlur(e) {
-    // 从基础库2.24.4版本起，在onBlur事件触发时，微信将异步对用户输入的内容进行安全监测
-    console.log('昵称输入完成:', e.detail.value);
   },
 
 
@@ -80,14 +69,6 @@ Page({
     const { avatarUrl, nickname } = this.data;
 
     // 验证必填字段
-    if (!avatarUrl) {
-      wx.showToast({
-        title: '请选择头像',
-        icon: 'none'
-      });
-      return;
-    }
-
     if (!nickname || nickname.trim() === '') {
       wx.showToast({
         title: '请输入昵称',
@@ -101,7 +82,8 @@ Page({
     try {
       // 上传头像到云存储
       let avatarFileID = avatarUrl;
-      if (!avatarUrl.startsWith('cloud://') && !avatarUrl.startsWith('http')) {
+      // 如果不是默认头像且不是云存储路径，则上传到云存储
+      if (avatarUrl !== defaultAvatarUrl && !avatarUrl.startsWith('cloud://') && !avatarUrl.startsWith('http')) {
         avatarFileID = await this.uploadAvatar(avatarUrl);
       }
 
@@ -137,14 +119,24 @@ Page({
 
         // 延迟跳转，让用户看到成功提示
         setTimeout(() => {
-          // 检查是否有待执行的API调用
-          const app = wx.getApp();
-          if (app.globalData.lastApiCall) {
-            // 重新执行之前的API调用
-            this.retryLastApiCall();
-          } else {
-            // 返回上一页
-            wx.navigateBack();
+          try {
+            // 检查是否有待执行的API调用
+            const app = wx.getApp();
+            if (app && app.globalData && app.globalData.lastApiCall) {
+              // 重新执行之前的API调用
+              this.retryLastApiCall();
+            } else {
+              // 跳转到首页（社区页面）
+              wx.switchTab({
+                url: '/pages/community/community'
+              });
+            }
+          } catch (error) {
+            console.error('获取应用实例失败:', error);
+            // 直接跳转到首页（社区页面）
+            wx.switchTab({
+              url: '/pages/community/community'
+            });
           }
         }, 1500);
 
@@ -178,27 +170,57 @@ Page({
    * 重试之前的API调用
    */
   async retryLastApiCall() {
-    const app = wx.getApp();
-    const lastApiCall = app.globalData.lastApiCall;
-    
-    if (!lastApiCall) {
-      wx.navigateBack();
-      return;
-    }
-
     try {
+      const app = wx.getApp();
+      if (!app || !app.globalData) {
+        console.error('应用实例不可用');
+        wx.switchTab({
+          url: '/pages/community/community'
+        });
+        return;
+      }
+      
+      const lastApiCall = app.globalData.lastApiCall;
+      
+      if (!lastApiCall) {
+        // 跳转到首页（社区页面）
+        wx.switchTab({
+          url: '/pages/community/community'
+        });
+        return;
+      }
+
       // 清除标记
       app.globalData.needUserRegister = false;
       app.globalData.lastApiCall = null;
 
       // 重新执行API调用
       const { apiService } = require('../../utils/api.js');
-      const result = await apiService.call(lastApiCall);
       
-      console.log('重试API调用成功:', result);
-      
-      // 返回上一页
-      wx.navigateBack();
+      try {
+        const result = await apiService.call(lastApiCall);
+        
+        // 跳转到首页（社区页面）
+        wx.switchTab({
+          url: '/pages/community/community'
+        });
+      } catch (apiError) {
+        // 如果是401错误，说明用户注册可能还没有生效，直接跳转到首页
+        if (apiError.statusCode === 401) {
+          wx.switchTab({
+            url: '/pages/community/community'
+          });
+        } else {
+          // 其他错误，显示提示并跳转到首页
+          wx.showToast({
+            title: '操作失败，请重试',
+            icon: 'none'
+          });
+          wx.switchTab({
+            url: '/pages/community/community'
+          });
+        }
+      }
       
     } catch (error) {
       console.error('重试API调用失败:', error);
@@ -206,7 +228,10 @@ Page({
         title: '操作失败，请重试',
         icon: 'none'
       });
-      wx.navigateBack();
+      // 跳转到首页（社区页面）
+      wx.switchTab({
+        url: '/pages/community/community'
+      });
     }
   }
 });
